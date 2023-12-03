@@ -61,7 +61,7 @@ fn find_digits_in_line(line: String, check_words: bool) -> Vec<char> {
 }
 
 fn find_digit_word_in_string(word: &String) -> Option<char> {
-    let range_end: usize = word.len() - MIN_WORD_LENGTH;
+    let range_end: usize = word.len() - MIN_WORD_LENGTH + 1;
 
     for i in 0..range_end {
         if let Some(digit) = WORD_TO_DIGIT.get(&word[i..]) {
@@ -106,6 +106,7 @@ fn find_sum(filename: &str, check_words: bool) -> u16 {
 
         if !to_parse.is_empty() {
             let digits = find_digits_in_line(to_parse, check_words);
+            println!("{:?}", digits);
             sum += convert_to_int(digits);
         }
     }
