@@ -4,6 +4,9 @@ use std::path::Path;
 use std::time::{Instant};
 use phf::phf_map;
 
+const MIN_WORD_LENGTH: usize = 3;
+const INPUT_FILE_PATH: &str = "inputs/input.txt";
+
 static WORD_TO_DIGIT: phf::Map<&'static str, char> = phf_map! {
     "one" => '1',
     "two" => '2',
@@ -15,8 +18,6 @@ static WORD_TO_DIGIT: phf::Map<&'static str, char> = phf_map! {
     "eight" => '8',
     "nine" => '9'
 };
-
-const MIN_WORD_LENGTH: usize = 3;
 
 fn read_lines<P>(filename: P) -> io::Lines<io::BufReader<File>> where P: AsRef<Path>, {
     match File::open(filename) {
@@ -90,10 +91,10 @@ fn convert_to_int(all_digits: Vec<char>) -> u16 {
     }
 }
 
-fn find_sum(filename: &str, check_words: bool) -> u16 {
+fn find_sum(check_words: bool) -> u16 {
     let mut sum: u16 = 0;
 
-    let lines = read_lines(Path::new(&filename));
+    let lines = read_lines(Path::new(INPUT_FILE_PATH));
 
     for line in lines {
         let to_parse = match line {
@@ -106,7 +107,6 @@ fn find_sum(filename: &str, check_words: bool) -> u16 {
 
         if !to_parse.is_empty() {
             let digits = find_digits_in_line(to_parse, check_words);
-            println!("{:?}", digits);
             sum += convert_to_int(digits);
         }
     }
@@ -115,15 +115,13 @@ fn find_sum(filename: &str, check_words: bool) -> u16 {
 }
 
 fn main() {
-    const INPUT_FILE_PATH: &str = "inputs/input.txt";
-
-    // let start = Instant::now();
-    // let sum = find_sum(INPUT_FILE_PATH, false);
-    // let duration = start.elapsed();
-    // println!("part 1 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
+    let start = Instant::now();
+    let sum = find_sum(false);
+    let duration = start.elapsed();
+    println!("part 1 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
 
     let start = Instant::now();
-    let sum = find_sum(INPUT_FILE_PATH, true);
+    let sum = find_sum(true);
     let duration = start.elapsed();
     println!("part 2 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
 }
