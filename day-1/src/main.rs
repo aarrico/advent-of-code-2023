@@ -1,11 +1,22 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::collections::HashMap;
 use std::time::{Instant};
+use phf::phf_map;
+
+static WORD_TO_DIGIT: phf::Map<&'static str, char> = phf_map! {
+    "one" => '1',
+    "two" => '2',
+    "three" => '3',
+    "four" => '4',
+    "five" => '5',
+    "six" => '6',
+    "seven" => '7',
+    "eight" => '8',
+    "nine" => '9'
+};
 
 const MIN_WORD_LENGTH: usize = 3;
-const MAX_WORD_LENGTH: usize = 5;
 
 fn read_lines<P>(filename: P) -> io::Lines<io::BufReader<File>> where P: AsRef<Path>, {
     match File::open(filename) {
@@ -17,36 +28,48 @@ fn read_lines<P>(filename: P) -> io::Lines<io::BufReader<File>> where P: AsRef<P
     }
 }
 
-fn find_digits_in_line(line: String, num_map: Option<&HashMap<&str, char>>) -> Vec<char> {
+// for part 2, we build a string, digit_as_word, as we loop through the line.
+// we know the length of the the numbers 1 - 9 so we can start checking WORD_TO_DIGIT
+// when 3 <= len(digit_as_word) <= 5 and if there's no match past 5 chars, clear
+// it. we can also clear it as soon as we find a real digit as well.
+fn find_digits_in_line(line: String, check_words: bool) -> Vec<char> {
     let mut all_digits = Vec::new();
-    let mut digit_as_word = String::new();
-    let check_words: bool = !num_map.is_none();
+    let mut str_to_check = String::new();
 
-    // for part 2, we build a string, digit_as_word, as we loop through the line.
-    // we know the length of the the numbers 1 - 9 so we can start checking NUM_MAP
-    // when 3 <= len(digit_as_word) <= 5 and if there's no match past 5 chars, clear
-    // it. we can also clear it as soon as we find a real digit as well.
     for c in line.chars() {
         if c.is_digit(10) {
             all_digits.push(c);
-
             if check_words {
-                digit_as_word.clear();
+                str_to_check.clear();
             }
         } else if check_words {
-            digit_as_word.push(c);
-            let len = digit_as_word.len();
-            if len >= MIN_WORD_LENGTH && len <= MAX_WORD_LENGTH {
-                if let Some(num) = num_map.unwrap().get(digit_as_word.as_str()) {
-                    all_digits.push(*num);
+            str_to_check.push(c);
+
+            if str_to_check.len() >= MIN_WORD_LENGTH {
+                if let Some(digit) = find_digit_word_in_string(&str_to_check) {
+                    all_digits.push(digit);
                 }
-            } else if len > 5 {
-                digit_as_word.clear();
             }
+        }
+
+        if str_to_check.len() == 5 {
+            str_to_check = str_to_check[1..].to_string()
         }
     }
 
     all_digits
+}
+
+fn find_digit_word_in_string(word: &String) -> Option<char> {
+    let range_end: usize = word.len() - MIN_WORD_LENGTH;
+
+    for i in 0..range_end {
+        if let Some(digit) = WORD_TO_DIGIT.get(&word[i..]) {
+            return Some(*digit);
+        }
+    }
+
+    None
 }
 
 fn convert_to_int(all_digits: Vec<char>) -> u16 {
@@ -67,7 +90,7 @@ fn convert_to_int(all_digits: Vec<char>) -> u16 {
     }
 }
 
-fn find_sum(filename: &str, num_map: Option<&HashMap<&str, char>>) -> u16 {
+fn find_sum(filename: &str, check_words: bool) -> u16 {
     let mut sum: u16 = 0;
 
     let lines = read_lines(Path::new(&filename));
@@ -82,7 +105,7 @@ fn find_sum(filename: &str, num_map: Option<&HashMap<&str, char>>) -> u16 {
         };
 
         if !to_parse.is_empty() {
-            let digits = find_digits_in_line(to_parse, num_map);
+            let digits = find_digits_in_line(to_parse, check_words);
             sum += convert_to_int(digits);
         }
     }
@@ -93,25 +116,13 @@ fn find_sum(filename: &str, num_map: Option<&HashMap<&str, char>>) -> u16 {
 fn main() {
     const INPUT_FILE_PATH: &str = "inputs/input.txt";
 
-    let num_map: HashMap<&str, char> = HashMap::from([
-        ("one", '1'),
-        ("two", '2'),
-        ("three", '3'),
-        ("four", '4'),
-        ("five", '5'),
-        ("six", '6'),
-        ("seven", '7'),
-        ("eight", '8'),
-        ("nine", '9')
-    ]);
-
     // let start = Instant::now();
-    // let sum = find_sum(INPUT_FILE_PATH, None);
+    // let sum = find_sum(INPUT_FILE_PATH, false);
     // let duration = start.elapsed();
     // println!("part 1 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
 
     let start = Instant::now();
-    let sum = find_sum(INPUT_FILE_PATH, Some(&num_map));
+    let sum = find_sum(INPUT_FILE_PATH, true);
     let duration = start.elapsed();
     println!("part 2 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
 }
