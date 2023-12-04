@@ -1,113 +1,13 @@
+mod cube_set;
+mod game_data;
+
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::cmp::Ordering;
+use crate::cube_set::cube_set::CubeSet;
+use crate::game_data::game_data::GameData;
 
 const INPUT_FILE_PATH: &str = "inputs/input.txt";
-
-#[derive(Debug, Eq, Ord)]
-struct CubeSet {
-    blue: u32,
-    red: u32,
-    green: u32,
-}
-
-impl CubeSet {
-    fn parse_from_str(set_str: &str) -> Self {
-        let set = set_str.split(',');
-        let mut blue: u32 = 0;
-        let mut red: u32 = 0;
-        let mut green: u32 = 0;
-
-        for cube in set {
-            let cube_data: Vec<&str> = cube.split_whitespace().collect();
-
-            if cube_data.len() != 2 {
-                panic!("invalid cube data:\n\t{:?}", cube_data);
-            }
-
-            let count =
-                match cube_data[0].parse::<u32>() {
-                    Ok(count) => count,
-                    Err(err) =>
-                        panic!("couldn't process cube count for round {}:\n\terr: {}", set_str, err)
-                };
-
-            match cube_data[1] {
-                "red" => { red = count; }
-                "blue" => { blue = count; }
-                "green" => { green = count; }
-                _ => panic!("bad cube color: {:?}", cube_data)
-            }
-        }
-
-        Self {
-            blue,
-            red,
-            green,
-        }
-    }
-
-    fn parse_sets_from_str(sets_str: &str) -> Vec<CubeSet> {
-        let rounds_to_parse: Vec<&str> = sets_str.split(";").collect();
-
-        let mut sets: Vec<CubeSet> = Vec::new();
-
-        for g in rounds_to_parse {
-            sets.push(CubeSet::parse_from_str(g));
-        }
-
-        sets
-    }
-
-    fn set_min_cubes(&mut self, to_check: &CubeSet) {
-        if to_check.blue > self.blue {
-            self.blue = to_check.blue;
-        }
-
-        if to_check.red > self.red {
-            self.red = to_check.red;
-        }
-
-        if to_check.green > self.green {
-            self.green = to_check.green;
-        }
-    }
-
-    fn get_power(self) -> u32 {
-        self.red * self.green * self.blue
-    }
-}
-
-impl PartialEq<Self> for CubeSet {
-    fn eq(&self, other: &Self) -> bool {
-        &self.blue == &other.blue
-            && &self.red == &other.red
-            && &self.green == &other.green
-    }
-}
-
-impl PartialOrd for CubeSet {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.red < other.red && self.blue < other.blue && self.green < other.green {
-            return Some(Ordering::Less);
-        } else if self.red > other.red && self.blue > other.blue && self.green > other.green {
-            return Some(Ordering::Greater);
-        } else if self.red > other.red || self.green > other.green || self.blue > other.blue {
-            return Some(Ordering::Greater);
-        } else if self == other {
-            return Some(Ordering::Equal);
-        }
-
-        return Some(self.cmp(&other));
-    }
-}
-
-#[derive(Debug)]
-struct GameData {
-    game_num: u32,
-    rounds: Vec<CubeSet>,
-}
 
 fn read_lines<P>(filename: P) -> io::Lines<io::BufReader<File>> where P: AsRef<Path>, {
     match File::open(filename) {
