@@ -1,6 +1,6 @@
 # Purpose
 
-Using the 2023 Advent of Code challenge as an opprotunity to learn Rust. As such, the solutions may not be the best versions that they can be, but the goal is to improve my understanding of how Rust works and become a Rustacean!
+Using the 2023 Advent of Code challenge as an opprotunity to learn Rust. As such, the solutions may not be the most elegant versions that they can be, but the goal is to improve my understanding of how Rust works and become a Rustacean!
 
 # Motivation
 
