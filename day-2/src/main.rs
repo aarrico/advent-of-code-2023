@@ -3,23 +3,21 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::cmp::Ordering;
 
-//use std::time::{Instant};
-
 const INPUT_FILE_PATH: &str = "inputs/input.txt";
 
 #[derive(Debug, Eq, Ord)]
 struct CubeSet {
-    blue: u16,
-    red: u16,
-    green: u16,
+    blue: u32,
+    red: u32,
+    green: u32,
 }
 
 impl CubeSet {
     fn parse_from_str(set_str: &str) -> Self {
         let set = set_str.split(',');
-        let mut blue: u16 = 0;
-        let mut red: u16 = 0;
-        let mut green: u16 = 0;
+        let mut blue: u32 = 0;
+        let mut red: u32 = 0;
+        let mut green: u32 = 0;
 
         for cube in set {
             let cube_data: Vec<&str> = cube.split_whitespace().collect();
@@ -29,7 +27,7 @@ impl CubeSet {
             }
 
             let count =
-                match cube_data[0].parse::<u16>() {
+                match cube_data[0].parse::<u32>() {
                     Ok(count) => count,
                     Err(err) =>
                         panic!("couldn't process cube count for round {}:\n\terr: {}", set_str, err)
@@ -61,6 +59,24 @@ impl CubeSet {
 
         sets
     }
+
+    fn set_min_cubes(&mut self, to_check: &CubeSet) {
+        if to_check.blue > self.blue {
+            self.blue = to_check.blue;
+        }
+
+        if to_check.red > self.red {
+            self.red = to_check.red;
+        }
+
+        if to_check.green > self.green {
+            self.green = to_check.green;
+        }
+    }
+
+    fn get_power(self) -> u32 {
+        self.red * self.green * self.blue
+    }
 }
 
 impl PartialEq<Self> for CubeSet {
@@ -89,7 +105,7 @@ impl PartialOrd for CubeSet {
 
 #[derive(Debug)]
 struct GameData {
-    game_num: u16,
+    game_num: u32,
     rounds: Vec<CubeSet>,
 }
 
@@ -107,7 +123,7 @@ fn parse_line(to_split: &String) -> GameData {
     let [game_num_str, rounds] = to_split.split(":").collect::<Vec<&str>>()[..]
         else { panic!("malformed line found:/n/t{}", to_split) };
 
-    if let Ok(game_num) = game_num_str[5..].parse::<u16>() {
+    if let Ok(game_num) = game_num_str[5..].parse::<u32>() {
         GameData {
             game_num,
             rounds: CubeSet::parse_sets_from_str(&rounds[1..]),
@@ -141,14 +157,30 @@ fn is_game_possible(game_data: &GameData, cubes_to_check: &CubeSet) -> bool {
     return true;
 }
 
-fn find_sum(cubes_to_check: &CubeSet) -> u16 {
-    let mut sum: u16 = 0;
-    let lines = read_lines(Path::new(INPUT_FILE_PATH));
+fn find_power_of_minimum_cubes_needed(game_data: &GameData) -> u32 {
+    let mut min_cubes = CubeSet {
+        blue: 0,
+        red: 0,
+        green: 0,
+    };
 
-    let games = populate_game_data(lines);
+    for round in &game_data.rounds {
+        min_cubes.set_min_cubes(round);
+    }
+
+    min_cubes.get_power()
+}
+
+fn find_sum(games: &Vec<GameData>, cubes_to_check: &Option<CubeSet>) -> u32 {
+    let mut sum: u32 = 0;
+
     for g in games {
-        if is_game_possible(&g, cubes_to_check) {
-            sum += g.game_num;
+        if let Some(cubes_to_check) = cubes_to_check {
+            if is_game_possible(&g, cubes_to_check) {
+                sum += g.game_num;
+            }
+        } else {
+            sum += find_power_of_minimum_cubes_needed(&g);
         }
     }
 
@@ -156,13 +188,19 @@ fn find_sum(cubes_to_check: &CubeSet) -> u16 {
 }
 
 fn main() {
-    //12 red, 13 green, 14 blue
+    let lines = read_lines(Path::new(INPUT_FILE_PATH));
+
+    let games = populate_game_data(lines);
+
     let part1_cubes = CubeSet {
         red: 12,
         green: 13,
         blue: 14,
     };
 
-    let sum = find_sum(&part1_cubes);
-    println!("{}", sum)
+    let part1_sum = find_sum(&games, &Some(part1_cubes));
+    println!("part 1 sum: {}", part1_sum);
+
+    let part2_sum = find_sum(&games, &None);
+    println!("part 2 sum: {}", part2_sum);
 }
