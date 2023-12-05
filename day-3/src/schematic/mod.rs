@@ -115,17 +115,18 @@ impl fmt::Display for Schematic {
 
 fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> String {
     let mut prev = &row[y_initial];
-    let mut next = &row[y_initial];
+    let mut next;
 
     let mut y_prev = y_initial;
     let mut y_next = y_initial;
-    let mut num_str = prev.get_value().to_string();
+    let mut num_str = String::from(prev.get_value());
 
     let mut continue_back = true;
     let mut continue_forward = true;
 
-    while continue_back && continue_forward {
-        if continue_back || y_prev > 0 {
+    while continue_back || continue_forward {
+
+        if continue_back && y_prev > 0 {
             y_prev -= 1;
             prev = &row[y_prev];
 
@@ -133,12 +134,14 @@ fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> 
 
             if is_number {
                 num_str = format!("{}{num_str}", prev.get_value());
-            } else if !is_number || y_prev == 0 {
+            }
+
+            if !is_number || y_prev == 0 {
                 continue_back = false;
             }
         }
 
-        if continue_forward || y_next < y_max {
+        if continue_forward && y_next < y_max {
             y_next += 1;
             next = &row[y_next];
 
@@ -148,7 +151,7 @@ fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> 
                 num_str.push(next.get_value());
             }
 
-            if !is_number || y_next > y_max {
+            if !is_number || y_next == y_max {
                 continue_forward = false;
             }
         }
