@@ -40,9 +40,14 @@ impl fmt::Display for MatrixObj {
     }
 }
 
+pub struct Position {
+    x: usize,
+    y: usize,
+}
+
 pub struct Matrix {
     pub data: Vec<Vec<MatrixObj>>,
-    pub symbol_positions: Vec<(usize, usize)>,
+    pub symbol_positions: Vec<Position>,
 }
 
 impl Matrix {
@@ -53,7 +58,7 @@ impl Matrix {
             .map(|line| line.unwrap().chars().collect::<Vec<_>>());
 
         let mut data: Vec<Vec<MatrixObj>> = Vec::new();
-        let mut symbol_positions: Vec<(usize, usize)> = Vec::new();
+        let mut symbol_positions: Vec<Position> = Vec::new();
 
         for (x, chars) in lines.enumerate() {
             data.push(Vec::new());
@@ -62,7 +67,7 @@ impl Matrix {
                 let char_type = MatrixObj::determine_type(*c);
 
                 if matches!(char_type.is_symbol(), true) {
-                    symbol_positions.push((x, y))
+                    symbol_positions.push(Position { x, y })
                 }
 
                 data[x].push(char_type);
