@@ -12,7 +12,7 @@ use std::collections::HashSet;
 
 pub struct Schematic {
     matrix: Vec<Vec<SchematicObj>>,
-    symbol_positions: HashSet<Position>,
+    symbol_positions: Vec<Position>,
     row_count: usize,
     col_count: usize,
 }
@@ -25,7 +25,7 @@ impl Schematic {
             .map(|line| line.unwrap().chars().collect::<Vec<_>>());
 
         let mut matrix: Vec<Vec<SchematicObj>> = Vec::new();
-        let mut symbol_positions: HashSet<Position> = HashSet::new();
+        let mut symbol_positions: Vec<Position> = Vec::new();
 
         for (x, chars) in lines.enumerate() {
             matrix.push(Vec::new());
@@ -33,8 +33,8 @@ impl Schematic {
             for (y, c) in chars.iter().enumerate() {
                 let char_type = SchematicObj::determine_type(*c);
 
-                if matches!(char_type.is_symbol(), true) {
-                    symbol_positions.insert(Position::new(x, y));
+                if char_type.is_symbol() {
+                    symbol_positions.push(Position::new(x, y));
                 }
 
                 matrix[x].push(char_type);
@@ -56,8 +56,8 @@ impl Schematic {
         (self.row_count - 1, self.col_count - 1)
     }
 
-    fn get_digit_positions(&self) -> HashSet<Position> {
-        let mut adj_pos: HashSet<Position> = HashSet::new();
+    fn get_digit_positions(&self) -> Vec<Position> {
+        let mut adj_pos: Vec<Position> = Vec::new();
 
         let (x_dim, y_dim) = self.get_dimensions();
 
@@ -66,9 +66,11 @@ impl Schematic {
 
             for x in position::get_range(sym_x, x_dim - 1) {
                 for y in position::get_range(sym_y, y_dim - 1) {
-                    if SchematicObj::is_number(&self.matrix[x][y]) {
-                        adj_pos.insert(Position::new(x, y));
-                        break;
+                    if self.matrix[x][y].is_number() {
+                        adj_pos.push(Position::new(x, y));
+                        if y != sym_y {
+                            break;
+                        }
                     }
                 }
             }
@@ -86,6 +88,8 @@ impl Schematic {
             let (_, y_max) = self.get_dimensions();
 
             let num_str = build_number_str(&self.matrix[x], y, y_max);
+
+            print!("{num_str},");
 
             if let Ok(num) = num_str.parse::<usize>() {
                 sum += num;
@@ -137,8 +141,8 @@ fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> 
             next_y += 1;
             next = &row[next_y];
 
-            if prev.is_number() {
-                num_str.push(row[prev_y].get_value());
+            if next.is_number() {
+                num_str.push(row[next_y].get_value());
             }
         }
     }
