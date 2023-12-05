@@ -8,6 +8,7 @@ use std::fmt;
 use std::fmt::Formatter;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
+use std::collections::HashSet;
 
 pub struct Matrix {
     data: Vec<Vec<MatrixObj>>,
@@ -48,8 +49,8 @@ impl Matrix {
         (self.data.len(), self.data[0].len())
     }
 
-    pub fn get_adjacent_number_positions(&self) -> Vec<Position> {
-        let mut adj_pos: Vec<Position> = Vec::new();
+    pub fn get_adjacent_number_positions(&self) -> HashSet<Position> {
+        let mut adj_pos: HashSet<Position> = HashSet::new();
 
         let (x_dim, y_dim) = self.get_dimensions();
 
@@ -58,24 +59,21 @@ impl Matrix {
 
             for x in position::get_range(sym_x, x_dim - 1) {
                 for y in position::get_range(sym_y, y_dim - 1) {
-
                     if MatrixObj::is_number(&self.data[x][y]) {
-                        println!("{:?}", self.data[x][y]);
-                        adj_pos.push(Position::new(x, y));
+                        adj_pos.insert(Position::new(x, y));
                     }
                 }
             }
         }
 
+        println!("{}", adj_pos.len());
         adj_pos
     }
 
-    pub fn check_adjacent_positions(self) {
-        let (x_dim, y_dim) = self.get_dimensions();
-        for pos in &self.symbol_positions {
-            let adj_positions =
-                self.get_adjacent_number_positions();
-        }
+    pub fn check_adjacent_positions_for_nums(self) {
+        let adjacent_num_positions = self.get_adjacent_number_positions();
+
+        for pos in &adjacent_num_positions {}
     }
 }
 
