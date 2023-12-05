@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::Formatter;
+use std::mem::discriminant;
 
 #[derive(Debug)]
 pub enum MatrixObj {
@@ -9,12 +10,13 @@ pub enum MatrixObj {
 }
 
 impl MatrixObj {
-    pub fn is_symbol(&self) -> bool {
-        if let MatrixObj::Symbol { .. } = self {
-            return true;
-        }
 
-        return false;
+    pub fn is_number(&self) -> bool {
+        Self::is_same_variant(&self, &Self::Number(0))
+    }
+
+    pub fn is_symbol(&self) -> bool {
+        self.is_same_variant(&Self::Symbol('*'))
     }
 
     pub fn determine_type(c: char) -> Self {
@@ -24,7 +26,11 @@ impl MatrixObj {
             return Self::Symbol(c);
         }
 
-        return Self::Period;
+        Self::Period
+    }
+
+    fn is_same_variant(&self, other: &Self) -> bool {
+        discriminant(self) == discriminant(&other)
     }
 }
 

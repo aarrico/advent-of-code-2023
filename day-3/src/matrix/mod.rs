@@ -48,10 +48,33 @@ impl Matrix {
         (self.data.len(), self.data[0].len())
     }
 
-    pub fn check_adjacent_values(self,) {
+    pub fn get_adjacent_number_positions(&self) -> Vec<Position> {
+        let mut adj_pos: Vec<Position> = Vec::new();
+
+        let (x_dim, y_dim) = self.get_dimensions();
+
+        for sym_pos in &self.symbol_positions {
+            let (sym_x, sym_y) = sym_pos.get();
+
+            for x in position::get_range(sym_x, x_dim - 1) {
+                for y in position::get_range(sym_y, y_dim - 1) {
+
+                    if MatrixObj::is_number(&self.data[x][y]) {
+                        println!("{:?}", self.data[x][y]);
+                        adj_pos.push(Position::new(x, y));
+                    }
+                }
+            }
+        }
+
+        adj_pos
+    }
+
+    pub fn check_adjacent_positions(self) {
         let (x_dim, y_dim) = self.get_dimensions();
         for pos in &self.symbol_positions {
-            println!("{:?}", &pos.get_adjacent_positions(x_dim - 1, y_dim - 1))
+            let adj_positions =
+                self.get_adjacent_number_positions();
         }
     }
 }
