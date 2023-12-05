@@ -12,7 +12,7 @@ use std::collections::HashSet;
 
 pub struct MatrixData {
     matrix: Vec<Vec<MatrixObj>>,
-    symbol_positions: Vec<Position>,
+    symbol_positions: HashSet<Position>,
 }
 
 impl MatrixData {
@@ -22,25 +22,25 @@ impl MatrixData {
         let lines = file.lines()
             .map(|line| line.unwrap().chars().collect::<Vec<_>>());
 
-        let mut data: Vec<Vec<MatrixObj>> = Vec::new();
-        let mut symbol_positions: Vec<Position> = Vec::new();
+        let mut matrix: Vec<Vec<MatrixObj>> = Vec::new();
+        let mut symbol_positions: HashSet<Position> = HashSet::new();
 
         for (x, chars) in lines.enumerate() {
-            data.push(Vec::new());
+            matrix.push(Vec::new());
 
             for (y, c) in chars.iter().enumerate() {
                 let char_type = MatrixObj::determine_type(*c);
 
                 if matches!(char_type.is_symbol(), true) {
-                    symbol_positions.push(Position::new(x, y))
+                    symbol_positions.insert(Position::new(x, y));
                 }
 
-                data[x].push(char_type);
+                matrix[x].push(char_type);
             }
         }
 
         MatrixData {
-            matrix: data,
+            matrix,
             symbol_positions,
         }
     }
@@ -72,7 +72,7 @@ impl MatrixData {
     pub fn get_part_number_sum(self) -> usize {
         let mut sum: usize = 0;
         let adjacent_digit_positions = self.get_adjacent_digit_positions();
-
+        
         for pos in &adjacent_digit_positions {}
 
         sum
