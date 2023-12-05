@@ -45,11 +45,11 @@ impl MatrixData {
         }
     }
 
-    pub fn get_dimensions(&self) -> (usize, usize) {
+    fn get_dimensions(&self) -> (usize, usize) {
         (self.matrix.len(), self.matrix[0].len())
     }
 
-    pub fn get_adjacent_digit_positions(&self) -> HashSet<Position> {
+    fn get_digit_positions(&self) -> HashSet<Position> {
         let mut adj_pos: HashSet<Position> = HashSet::new();
 
         let (x_dim, y_dim) = self.get_dimensions();
@@ -71,9 +71,9 @@ impl MatrixData {
 
     pub fn get_part_number_sum(self) -> usize {
         let mut sum: usize = 0;
-        let adjacent_digit_positions = self.get_adjacent_digit_positions();
-        
-        for pos in &adjacent_digit_positions {}
+        let digit_positions = self.get_digit_positions();
+
+        for pos in &digit_positions {}
 
         sum
     }
