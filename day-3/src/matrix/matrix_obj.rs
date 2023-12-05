@@ -4,7 +4,7 @@ use std::mem::discriminant;
 
 #[derive(Debug)]
 pub enum MatrixObj {
-    Number(u8),
+    Number(u32),
     Symbol(char),
     Period,
 }
@@ -21,7 +21,7 @@ impl MatrixObj {
 
     pub fn determine_type(c: char) -> Self {
         if c.is_ascii_digit() {
-            return Self::Number(c as u8);
+            return Self::Number(c.to_digit(10)?);
         } else if c != '.' {
             return Self::Symbol(c);
         }
