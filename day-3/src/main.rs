@@ -1,11 +1,8 @@
 mod matrix;
-
-use crate::matrix::Matrix;
-
-// fn check_adjacent_values(symbols_positions: &Vec<()>)
+use matrix::{Matrix};
 
 fn main() {
     let matrix = Matrix::build_from_text("input.txt");
 
-    println!("{:?}", matrix.get_dimensions());
+    println!("{:?}", matrix.check_adjacent_values());
 }

@@ -1,53 +1,17 @@
+mod matrix_obj;
+mod position;
+
+use matrix_obj::MatrixObj;
+use position::Position;
+
 use std::fmt;
 use std::fmt::Formatter;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-#[derive(Debug)]
-pub enum MatrixObj {
-    Number(u8),
-    Symbol(char),
-    Period,
-}
-
-impl MatrixObj {
-    pub fn is_symbol(&self) -> bool {
-        if let MatrixObj::Symbol { .. } = self {
-            return true;
-        }
-
-        return false;
-    }
-
-    pub fn determine_type(c: char) -> Self {
-        if c.is_ascii_digit() {
-            return Self::Number(c as u8);
-        } else if c != '.' {
-            return Self::Symbol(c);
-        }
-
-        return Self::Period;
-    }
-}
-
-impl fmt::Display for MatrixObj {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            MatrixObj::Number(num) => { write!(f, "{}", num) }
-            MatrixObj::Symbol(sym) => { write!(f, "{}", sym) }
-            MatrixObj::Period => write!(f, ".")
-        }
-    }
-}
-
-pub struct Position {
-    x: usize,
-    y: usize,
-}
-
 pub struct Matrix {
-    pub data: Vec<Vec<MatrixObj>>,
-    pub symbol_positions: Vec<Position>,
+    data: Vec<Vec<MatrixObj>>,
+    symbol_positions: Vec<Position>,
 }
 
 impl Matrix {
@@ -67,7 +31,7 @@ impl Matrix {
                 let char_type = MatrixObj::determine_type(*c);
 
                 if matches!(char_type.is_symbol(), true) {
-                    symbol_positions.push(Position { x, y })
+                    symbol_positions.push(Position::new(x, y))
                 }
 
                 data[x].push(char_type);
@@ -80,8 +44,15 @@ impl Matrix {
         }
     }
 
-    pub fn get_dimensions(self) -> (usize, usize) {
+    pub fn get_dimensions(&self) -> (usize, usize) {
         (self.data.len(), self.data[0].len())
+    }
+
+    pub fn check_adjacent_values(self,) {
+        let (x_dim, y_dim) = self.get_dimensions();
+        for pos in &self.symbol_positions {
+            println!("{:?}", &pos.get_adjacent_positions(x_dim - 1, y_dim - 1))
+        }
     }
 }
 
