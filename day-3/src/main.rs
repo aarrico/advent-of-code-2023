@@ -1,8 +1,8 @@
-mod matrix;
-use matrix::{Matrix};
+mod matrix_data;
+use matrix_data::{MatrixData};
 
 fn main() {
-    let matrix = Matrix::build_from_text("input.txt");
+    let matrix = MatrixData::build_from_text("input.txt");
 
-    matrix.check_adjacent_positions_for_nums();
+    matrix.get_part_number_sum();
 }

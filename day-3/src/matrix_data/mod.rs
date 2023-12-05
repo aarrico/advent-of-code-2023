@@ -10,12 +10,12 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 use std::collections::HashSet;
 
-pub struct Matrix {
-    data: Vec<Vec<MatrixObj>>,
+pub struct MatrixData {
+    matrix: Vec<Vec<MatrixObj>>,
     symbol_positions: Vec<Position>,
 }
 
-impl Matrix {
+impl MatrixData {
     pub fn build_from_text(filename: &str) -> Self {
         let file = BufReader::new(File::open(filename).unwrap());
 
@@ -39,17 +39,17 @@ impl Matrix {
             }
         }
 
-        Matrix {
-            data,
+        MatrixData {
+            matrix: data,
             symbol_positions,
         }
     }
 
     pub fn get_dimensions(&self) -> (usize, usize) {
-        (self.data.len(), self.data[0].len())
+        (self.matrix.len(), self.matrix[0].len())
     }
 
-    pub fn get_adjacent_number_positions(&self) -> HashSet<Position> {
+    pub fn get_adjacent_digit_positions(&self) -> HashSet<Position> {
         let mut adj_pos: HashSet<Position> = HashSet::new();
 
         let (x_dim, y_dim) = self.get_dimensions();
@@ -59,27 +59,29 @@ impl Matrix {
 
             for x in position::get_range(sym_x, x_dim - 1) {
                 for y in position::get_range(sym_y, y_dim - 1) {
-                    if MatrixObj::is_number(&self.data[x][y]) {
+                    if MatrixObj::is_number(&self.matrix[x][y]) {
                         adj_pos.insert(Position::new(x, y));
                     }
                 }
             }
         }
 
-        println!("{}", adj_pos.len());
         adj_pos
     }
 
-    pub fn check_adjacent_positions_for_nums(self) {
-        let adjacent_num_positions = self.get_adjacent_number_positions();
+    pub fn get_part_number_sum(self) -> usize {
+        let mut sum: usize = 0;
+        let adjacent_digit_positions = self.get_adjacent_digit_positions();
 
-        for pos in &adjacent_num_positions {}
+        for pos in &adjacent_digit_positions {}
+
+        sum
     }
 }
 
-impl fmt::Display for Matrix {
+impl fmt::Display for MatrixData {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        for row in &self.data {
+        for row in &self.matrix {
             for col in row {
                 write!(f, "{}", col)?;
             }
