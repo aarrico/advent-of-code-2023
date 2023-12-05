@@ -10,7 +10,6 @@ pub enum MatrixObj {
 }
 
 impl MatrixObj {
-
     pub fn is_number(&self) -> bool {
         Self::is_same_variant(&self, &Self::Number(0))
     }
@@ -20,8 +19,8 @@ impl MatrixObj {
     }
 
     pub fn determine_type(c: char) -> Self {
-        if c.is_ascii_digit() {
-            return Self::Number(c.to_digit(10)?);
+        if let Some(num) = c.to_digit(10) {
+            return Self::Number(num);
         } else if c != '.' {
             return Self::Symbol(c);
         }
