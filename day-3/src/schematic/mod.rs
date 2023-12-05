@@ -89,8 +89,6 @@ impl Schematic {
 
             let num_str = build_number_str(&self.matrix[x], y, y_max);
 
-            print!("{num_str},");
-
             if let Ok(num) = num_str.parse::<usize>() {
                 sum += num;
             } else {
@@ -119,30 +117,39 @@ fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> 
     let mut prev = &row[y_initial];
     let mut next = &row[y_initial];
 
-    let mut prev_y = y_initial;
-    let mut next_y = y_initial;
+    let mut y_prev = y_initial;
+    let mut y_next = y_initial;
     let mut num_str = prev.get_value().to_string();
 
-    loop {
-        if (prev.is_period() || prev_y == 0) && (next.is_period() || next_y == y_max) {
-            break;
-        }
+    let mut continue_back = true;
+    let mut continue_forward = true;
 
-        if prev_y > 0 {
-            prev_y -= 1;
-            prev = &row[prev_y];
+    while continue_back && continue_forward {
+        if continue_back || y_prev > 0 {
+            y_prev -= 1;
+            prev = &row[y_prev];
 
-            if prev.is_number() {
-                num_str = format!("{}{num_str}", row[prev_y].get_value());
+            let is_number = prev.is_number();
+
+            if is_number {
+                num_str = format!("{}{num_str}", prev.get_value());
+            } else if !is_number || y_prev == 0 {
+                continue_back = false;
             }
         }
 
-        if next_y < y_max {
-            next_y += 1;
-            next = &row[next_y];
+        if continue_forward || y_next < y_max {
+            y_next += 1;
+            next = &row[y_next];
 
-            if next.is_number() {
-                num_str.push(row[next_y].get_value());
+            let is_number = next.is_number();
+
+            if is_number {
+                num_str.push(next.get_value());
+            }
+
+            if !is_number || y_next > y_max {
+                continue_forward = false;
             }
         }
     }

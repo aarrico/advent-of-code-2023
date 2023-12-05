@@ -10,5 +10,5 @@ fn main() {
     let start = Instant::now();
     let sum = matrix.get_part_number_sum();
     let duration = start.elapsed();
-    //println!("part 1 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
+    println!("part 1 \n\tsum: {} \n\telapsed time: {}", sum, duration.as_micros());
 }

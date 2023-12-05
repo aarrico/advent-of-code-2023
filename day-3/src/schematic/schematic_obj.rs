@@ -18,10 +18,6 @@ impl SchematicObj {
         self.is_same_variant(&Self::Symbol('*'))
     }
 
-    pub fn is_period(&self) -> bool {
-        self.is_same_variant(&Self::Period('.'))
-    }
-
     pub fn determine_type(c: char) -> Self {
         if let Some(_num) = c.to_digit(10) {
             return Self::Number(c);
