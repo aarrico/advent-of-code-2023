@@ -1,31 +1,9 @@
-use std::fs::File;
-use std::io::{BufReader, BufRead};
+mod matrix;
 
-#[derive(Debug)]
-enum MatrixObj {
-    Number(u8),
-    Symbol(char),
-    Period,
-}
-
-fn determine_type(c: char) -> MatrixObj {
-    if c.is_ascii_digit() {
-        return MatrixObj::Number(c as u8);
-    } else if c != '.' {
-        return MatrixObj::Symbol(c);
-    }
-
-    return MatrixObj::Period;
-}
+use crate::matrix::Matrix;
 
 fn main() {
-    let mut file = BufReader::new(File::open("input.txt").unwrap());
-    let mut line = String::new();
+    let matrix = Matrix::build_from_text("input.txt");
 
-    file.read_line(&mut line).unwrap();
-
-    let matrix: Vec<Vec<MatrixObj>> =
-        file.lines()
-            .map(|line| line.unwrap().chars()
-                .map(|x| determine_type(x)).collect()).collect();
+    println!("{:?}", matrix.get_dimensions());
 }
