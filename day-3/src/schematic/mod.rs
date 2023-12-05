@@ -84,7 +84,7 @@ impl Schematic {
             let (x, y) = pos.get();
             let (_, y_max) = self.get_dimensions();
 
-            let num_str = build_number_str(&self.matrix[x], x, y, y_max);
+            let num_str = build_number_str(&self.matrix[x], y, y_max);
 
             if let Ok(num) = num_str.parse::<usize>() {
                 sum += num;
@@ -110,21 +110,34 @@ impl fmt::Display for Schematic {
     }
 }
 
-fn build_number_str(row: &Vec<SchematicObj>, x: usize, y_initial: usize, y_max: usize) -> String {
+fn build_number_str(row: &Vec<SchematicObj>, y_initial: usize, y_max: usize) -> String {
     let mut prev = &row[y_initial];
     let mut next = &row[y_initial];
 
-    let mut y = y_initial;
+    let mut prev_y = y_initial;
+    let mut next_y = y_initial;
     let mut num_str = prev.get_value().to_string();
 
     loop {
-        if prev.is_period() && next.is_period() {
+        if (prev.is_period() || prev_y == 0) && (next.is_period() || next_y == y_max) {
             break;
         }
 
-        if y > 0 || y == 0 {
-            if row[y].is_number() {
-                num_str = format!("{}{num_str}", row[y].get_value());
+        if prev_y > 0 {
+            prev_y -= 1;
+            prev = &row[prev_y];
+
+            if prev.is_number() {
+                num_str = format!("{}{num_str}", row[prev_y].get_value());
+            }
+        }
+
+        if next_y < y_max {
+            next_y += 1;
+            next = &row[next_y];
+
+            if prev.is_number() {
+                num_str.push(row[prev_y].get_value());
             }
         }
     }
