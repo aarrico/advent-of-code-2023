@@ -1,4 +1,4 @@
-use std::ops::Range;
+use std::ops::{Range, RangeInclusive};
 
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct Position {
@@ -16,12 +16,12 @@ impl Position {
     }
 }
 
-pub fn get_range(val: usize, upper_bound: usize) -> Range<usize> {
+pub fn get_range(val: usize, upper_bound: usize) -> RangeInclusive<usize> {
     if val == 0 {
-        return 0..(val + 1);
+        return 0..=(val + 1);
     } else if val == upper_bound {
-        return (val - 1)..(upper_bound + 1);
+        return (val - 1)..=upper_bound;
     }
 
-    (val - 1)..(val + 1)
+    (val - 1)..=(val + 1)
 }
