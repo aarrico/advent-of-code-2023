@@ -1,4 +1,4 @@
-use std::ops::{Range, RangeInclusive};
+use std::ops::{RangeInclusive};
 
 #[derive(Debug, Hash, PartialEq, Eq)]
 pub struct Position {

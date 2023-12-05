@@ -68,6 +68,7 @@ impl Schematic {
                 for y in position::get_range(sym_y, y_dim - 1) {
                     if SchematicObj::is_number(&self.matrix[x][y]) {
                         adj_pos.insert(Position::new(x, y));
+                        break;
                     }
                 }
             }
