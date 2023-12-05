@@ -23,7 +23,7 @@ impl SchematicObj {
     }
 
     pub fn determine_type(c: char) -> Self {
-        if let Some(num) = c.to_digit(10) {
+        if let Some(_num) = c.to_digit(10) {
             return Self::Number(c);
         } else if c != '.' {
             return Self::Symbol(c);
@@ -50,7 +50,7 @@ impl fmt::Display for SchematicObj {
         match self {
             SchematicObj::Number(num) => { write!(f, "{}", num) }
             SchematicObj::Symbol(sym) => { write!(f, "{}", sym) }
-            SchematicObj::Period(period) => write!(f, ".")
+            SchematicObj::Period(period) => write!(f, "{}", period)
         }
     }
 }

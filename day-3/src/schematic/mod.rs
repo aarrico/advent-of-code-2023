@@ -86,7 +86,7 @@ impl Schematic {
 
             let num_str = build_number_str(&self.matrix[x], x, y, y_max);
 
-            if let Some(num) = num_str.parse::<u32>() {
+            if let Ok(num) = num_str.parse::<usize>() {
                 sum += num;
             } else {
                 panic!("bug in building number string\n\tfound: {}", num_str);
@@ -110,7 +110,6 @@ impl fmt::Display for Schematic {
     }
 }
 
-
 fn build_number_str(row: &Vec<SchematicObj>, x: usize, y_initial: usize, y_max: usize) -> String {
     let mut prev = &row[y_initial];
     let mut next = &row[y_initial];
@@ -118,15 +117,17 @@ fn build_number_str(row: &Vec<SchematicObj>, x: usize, y_initial: usize, y_max: 
     let mut y = y_initial;
     let mut num_str = prev.get_value().to_string();
 
-    // loop {
-    //     if prev.is_period() && next.is_period() {
-    //         break;
-    //     }
-    //
-    //     if y >= 0 {
-    //         //if
-    //     }
-    // }
+    loop {
+        if prev.is_period() && next.is_period() {
+            break;
+        }
+
+        if y > 0 || y == 0 {
+            if row[y].is_number() {
+                num_str = format!("{}{num_str}", row[y].get_value());
+            }
+        }
+    }
 
     num_str
 }
